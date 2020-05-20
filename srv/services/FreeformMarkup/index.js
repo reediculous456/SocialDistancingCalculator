@@ -17,7 +17,7 @@ const FreeformMarkupService = {
     .then(jsonify),
 
   getForUrn: (urn_id) => FreeformMarkup
-    .where({ change_request_id: null, urn_id })
+    .where({ urn_id })
     .fetchAll()
     .then(jsonify),
 
