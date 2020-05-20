@@ -1,0 +1,31 @@
+.card-header {
+  &:hover {
+    cursor: pointer;
+  }
+
+  h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: normal;
+    width: 75%;
+    padding-top: 8px;
+  }
+}
+
+.card {
+  margin-bottom: 1.5rem;
+}
+
+.card.bg-success,
+.card.bg-danger,
+.card.bg-secondary,
+.card.bg-dark {
+  .card-body {
+    background-color: white !important;
+  }
+}
+
+.accordion > .card:not(:last-of-type) {
+  border-bottom: 1px solid rgba(0,0,0,0.125);
+}
