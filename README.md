@@ -1,4 +1,4 @@
-Forge Maintenance Request
+Social Distancing Calculator
 ===========================
 
 ## Dependencies
@@ -9,7 +9,7 @@ Forge Maintenance Request
 ## Installation
 ### 1. Clone repository
 ````
-git@github.com:reediculous456/ForgeMaintenanceRequest.git
+git@github.com:reediculous456/SocialDistancingCalculator.git
 ````
 
 ### 2. Create configuration file in the config folder
