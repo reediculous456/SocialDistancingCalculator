@@ -340,15 +340,14 @@ ALTER SEQUENCE public.floors_id_seq OWNED BY public.floors.id;
 
 CREATE TABLE public.freeform_markups (
     id integer NOT NULL,
-    change_request_id integer,
     urn_id integer,
     type_id integer NOT NULL,
     attributes json NOT NULL,
-    x double precision NOT NULL,
-    y double precision NOT NULL,
-    width double precision NOT NULL,
-    height double precision NOT NULL,
-    size double precision NOT NULL,
+    x double precision,
+    y double precision,
+    width double precision,
+    height double precision,
+    size double precision,
     created_by integer NOT NULL,
     created_on timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_by integer,
@@ -900,14 +899,6 @@ ALTER TABLE ONLY public.floors
 
 ALTER TABLE ONLY public.floors
     ADD CONSTRAINT floors_floor_type_id_fkey FOREIGN KEY (floor_type_id) REFERENCES public.floor_types(id);
-
-
---
--- Name: freeform_markups freeform_markups_change_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.freeform_markups
-    ADD CONSTRAINT freeform_markups_change_request_id_fkey FOREIGN KEY (change_request_id) REFERENCES public.change_requests(id);
 
 
 --

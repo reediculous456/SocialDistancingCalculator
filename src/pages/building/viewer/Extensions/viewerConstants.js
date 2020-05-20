@@ -12,11 +12,6 @@ export const FREEFORM_MODES = {
   TEXT: 2,
 };
 
-export const SubcodeCadCodes = [
-  { ID: 1, code: `I-REQD_BK` },
-  { ID: 2, code: `I-SUPT_BK` },
-];
-
 export const FONTS = {
   EXTRA_EXTRA_SMALL_FONT_SIZE: 0.02925311203822,
   EXTRA_SMALL_FONT_SIZE: 0.079253112038222,
@@ -41,13 +36,15 @@ export const COLORS = {
 };
 
 export const EXTENSIONS = {
+  autodeskMeasure: `Autodesk.Measure`,
   buttonLoader: `buttonLoader`,
   changeRequestCreate: `changeRequestCreationExt`,
   changeRequestView: `changeRequestViewExt`,
   freeformMarkup: `freeformMarkupExt`,
   helpMenu: `helpMenu`,
+  itscMeasure: `itscMeasure`,
   markupsCore: `Autodesk.Viewing.MarkupsCore`,
-  measure: `Autodesk.Measure`,
+  measureLoader: `measureExtLoader`,
   navigationPanel: `navigationPanel`,
   viewAllMarkups: `viewAllMarkupsExt`,
 };

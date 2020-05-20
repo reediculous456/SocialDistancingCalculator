@@ -5,6 +5,7 @@
 <script>
 import arrify from 'arrify';
 import ButtonLoader from './Extensions/ButtonLoader/extension';
+import MeasureExtensionLoader from './Extensions/MeasureExtensionLoader/extension';
 import { EXTENSIONS } from './Extensions/viewerConstants';
 import { ForgeService, UrnService } from '@/services';
 
@@ -41,6 +42,7 @@ export default {
     onInitialized() {
       this.loadDocument();
       Autodesk.Viewing.theExtensionManager.registerExtension(EXTENSIONS.buttonLoader, ButtonLoader);
+      Autodesk.Viewing.theExtensionManager.registerExtension(EXTENSIONS.measureLoader, MeasureExtensionLoader);
     },
     loadDocument() {
       Autodesk.Viewing.Document.load(
@@ -100,8 +102,7 @@ export default {
       settingsTools.removeControl(`toolbar-propertiesTool`);
       settingsTools.removeControl(`toolbar-fullscreenTool`);
       this.viewer.loadExtension(EXTENSIONS.buttonLoader, { urn: this.urn });
-      this.viewer.unloadExtension(EXTENSIONS.measure);
-      this.viewer.toolbar.removeControl(`modelTools`);
+      this.viewer.loadExtension(EXTENSIONS.measureLoader, { urn: this.urn });
     },
     onModelLoadFail(errorCode) {
       console.error(`Model Load Failure - errorCode: ${errorCode}`); // eslint-disable-line no-console
