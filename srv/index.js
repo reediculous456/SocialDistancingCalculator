@@ -4,6 +4,7 @@ const app = express();
 const server = require(`http`).Server(app);
 const { ErrorHandler, IndexRoute, Morgan, RouteLoader, logger } = require(`./utils`);
 const favicon = require(`serve-favicon`);
+const Redis = require(`redis`);
 const session = require(`express-session`);
 const RedisStore = require(`connect-redis`)(session);
 const bodyParser = require(`body-parser`);
@@ -15,9 +16,11 @@ const sesh = session({
   saveUninitialized: true,
   secret: config.get(`cache.sessionKey`),
   store: new RedisStore({
-    host: config.get(`cache.host`),
-    pass: config.get(`cache.pass`),
-    port: config.get(`cache.port`),
+    client: Redis.createClient({
+      host: config.get(`cache.host`),
+      pass: config.get(`cache.pass`),
+      port: config.get(`cache.port`),
+    }),
   }),
   ttl: config.has(`cache.ttl`) ? config.get(`cache.ttl`) : 86400,
 });
