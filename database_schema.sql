@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.0 (Debian 12.0-2.pgdg100+1)
--- Dumped by pg_dump version 12.0 (Debian 12.0-2.pgdg100+1)
+-- Dumped from database version 12.2 (Debian 12.2-2.pgdg100+1)
+-- Dumped by pg_dump version 12.2 (Debian 12.2-2.pgdg100+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -54,80 +54,6 @@ CREATE SEQUENCE public.addresses_id_seq
 --
 
 ALTER SEQUENCE public.addresses_id_seq OWNED BY public.addresses.id;
-
-
---
--- Name: allocation_markups; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.allocation_markups (
-    id integer NOT NULL,
-    polyline_id integer NOT NULL,
-    allocation_type_id integer NOT NULL,
-    text text NOT NULL,
-    x double precision NOT NULL,
-    y double precision NOT NULL,
-    width double precision NOT NULL,
-    height double precision NOT NULL,
-    size double precision NOT NULL,
-    created_by integer NOT NULL,
-    created_on timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    assigned_to integer NOT NULL,
-    deleted_by integer,
-    deleted_on timestamp with time zone
-);
-
-
---
--- Name: allocation_markups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.allocation_markups_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: allocation_markups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.allocation_markups_id_seq OWNED BY public.allocation_markups.id;
-
-
---
--- Name: allocation_types; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.allocation_types (
-    id integer NOT NULL,
-    name text NOT NULL,
-    polyline_type_id integer NOT NULL,
-    active boolean DEFAULT true NOT NULL
-);
-
-
---
--- Name: allocation_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.allocation_types_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: allocation_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.allocation_types_id_seq OWNED BY public.allocation_types.id;
 
 
 --
@@ -481,71 +407,6 @@ ALTER SEQUENCE public.markup_types_id_seq OWNED BY public.markup_types.id;
 
 
 --
--- Name: polyline_categories; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.polyline_categories (
-    id integer NOT NULL,
-    code text NOT NULL,
-    name text NOT NULL,
-    active boolean DEFAULT true NOT NULL
-);
-
-
---
--- Name: polyline_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.polyline_categories_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: polyline_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.polyline_categories_id_seq OWNED BY public.polyline_categories.id;
-
-
---
--- Name: polyline_types; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.polyline_types (
-    id integer NOT NULL,
-    code text NOT NULL,
-    name text NOT NULL,
-    polyline_category_id integer NOT NULL,
-    active boolean DEFAULT true NOT NULL
-);
-
-
---
--- Name: polyline_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.polyline_types_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: polyline_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.polyline_types_id_seq OWNED BY public.polyline_types.id;
-
-
---
 -- Name: polylines; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -554,8 +415,7 @@ CREATE TABLE public.polylines (
     urn_id integer NOT NULL,
     object_id integer NOT NULL,
     handle text NOT NULL,
-    area numeric NOT NULL,
-    polyline_type_id integer NOT NULL
+    area numeric NOT NULL
 );
 
 
@@ -705,20 +565,6 @@ ALTER TABLE ONLY public.addresses ALTER COLUMN id SET DEFAULT nextval('public.ad
 
 
 --
--- Name: allocation_markups id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_markups ALTER COLUMN id SET DEFAULT nextval('public.allocation_markups_id_seq'::regclass);
-
-
---
--- Name: allocation_types id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_types ALTER COLUMN id SET DEFAULT nextval('public.allocation_types_id_seq'::regclass);
-
-
---
 -- Name: buildings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -782,20 +628,6 @@ ALTER TABLE ONLY public.markup_types ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Name: polyline_categories id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.polyline_categories ALTER COLUMN id SET DEFAULT nextval('public.polyline_categories_id_seq'::regclass);
-
-
---
--- Name: polyline_types id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.polyline_types ALTER COLUMN id SET DEFAULT nextval('public.polyline_types_id_seq'::regclass);
-
-
---
 -- Name: polylines id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -836,22 +668,6 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 ALTER TABLE ONLY public.addresses
     ADD CONSTRAINT addresses_pkey PRIMARY KEY (id);
-
-
---
--- Name: allocation_markups allocation_markups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_markups
-    ADD CONSTRAINT allocation_markups_pkey PRIMARY KEY (id);
-
-
---
--- Name: allocation_types allocation_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_types
-    ADD CONSTRAINT allocation_types_pkey PRIMARY KEY (id);
 
 
 --
@@ -935,22 +751,6 @@ ALTER TABLE ONLY public.markup_types
 
 
 --
--- Name: polyline_categories polyline_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.polyline_categories
-    ADD CONSTRAINT polyline_categories_pkey PRIMARY KEY (id);
-
-
---
--- Name: polyline_types polyline_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.polyline_types
-    ADD CONSTRAINT polyline_types_pkey PRIMARY KEY (id);
-
-
---
 -- Name: polylines polylines_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1004,54 +804,6 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.addresses
     ADD CONSTRAINT addresses_state_id_fkey FOREIGN KEY (state_id) REFERENCES public.states(id);
-
-
---
--- Name: allocation_markups allocation_markups_allocation_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_markups
-    ADD CONSTRAINT allocation_markups_allocation_type_id_fkey FOREIGN KEY (allocation_type_id) REFERENCES public.allocation_types(id);
-
-
---
--- Name: allocation_markups allocation_markups_assigned_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_markups
-    ADD CONSTRAINT allocation_markups_assigned_to_fkey FOREIGN KEY (assigned_to) REFERENCES public.users(id);
-
-
---
--- Name: allocation_markups allocation_markups_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_markups
-    ADD CONSTRAINT allocation_markups_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id);
-
-
---
--- Name: allocation_markups allocation_markups_deleted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_markups
-    ADD CONSTRAINT allocation_markups_deleted_by_fkey FOREIGN KEY (deleted_by) REFERENCES public.users(id);
-
-
---
--- Name: allocation_markups allocation_markups_polyline_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_markups
-    ADD CONSTRAINT allocation_markups_polyline_id_fkey FOREIGN KEY (polyline_id) REFERENCES public.polylines(id);
-
-
---
--- Name: allocation_types allocation_types_polyline_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_types
-    ADD CONSTRAINT allocation_types_polyline_type_id_fkey FOREIGN KEY (polyline_type_id) REFERENCES public.polyline_types(id);
 
 
 --
@@ -1188,22 +940,6 @@ ALTER TABLE ONLY public.freeform_markups
 
 ALTER TABLE ONLY public.freeform_markups
     ADD CONSTRAINT freeform_markups_urn_id_fkey FOREIGN KEY (urn_id) REFERENCES public.urns(id);
-
-
---
--- Name: polyline_types polyline_types_polyline_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.polyline_types
-    ADD CONSTRAINT polyline_types_polyline_category_id_fkey FOREIGN KEY (polyline_category_id) REFERENCES public.polyline_categories(id);
-
-
---
--- Name: polylines polylines_polyline_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.polylines
-    ADD CONSTRAINT polylines_polyline_type_id_fkey FOREIGN KEY (polyline_type_id) REFERENCES public.polyline_types(id);
 
 
 --

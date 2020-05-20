@@ -10,7 +10,7 @@
   },
   "database": {
     "dialect": "pg",
-    "version": 12.0,
+    "version": 12.2,
     "connection": {
       "host": "localhost",
       "port": 5432,
