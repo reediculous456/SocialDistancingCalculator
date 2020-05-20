@@ -7,8 +7,6 @@ const FloorService = require(`./Floor`);
 const FloorTypeService = require(`./FloorType`);
 const FreeformMarkupService = require(`./FreeformMarkup`);
 const PolylineService = require(`./Polyline`);
-const PolylineCategoryService = require(`./PolylineCategory`);
-const PolylineTypeService = require(`./PolylineType`);
 const ReportService = require(`./Report`);
 const StateService = require(`./State`);
 const TokenService = require(`./Token`);
@@ -24,9 +22,7 @@ module.exports = {
   FloorService,
   FloorTypeService,
   FreeformMarkupService,
-  PolylineCategoryService,
   PolylineService,
-  PolylineTypeService,
   ReportService,
   StateService,
   TokenService,

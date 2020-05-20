@@ -7,8 +7,6 @@ export * from './FloorType.service';
 export * from './Forge.service';
 export * from './FreeformMarkup.service';
 export * from './Login.service';
-export * from './PolylineCategory.service';
-export * from './PolylineType.service';
 export * from './Report.service';
 export * from './State.service';
 export * from './Urn.service';
