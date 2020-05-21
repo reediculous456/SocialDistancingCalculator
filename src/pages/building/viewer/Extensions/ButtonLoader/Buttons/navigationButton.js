@@ -7,16 +7,13 @@ export class NavigationButton extends Autodesk.Viewing.UI.Button {
     this.addClass(`fa`);
     this.setIcon(`fa-cube`);
 
-    const proto = this;
-    this.onClick = (e) => {
-      if ($(e.target).parent().hasClass(`inactive`)) {
-        proto.removeClass(`inactive`);
-        proto.addClass(`active`);
-        NOP_VIEWER.loadExtension(EXTENSIONS.navigationPanel, { urn });
-      } else {
-        proto.removeClass(`active`);
-        proto.addClass(`inactive`);
+    this.onClick = () => {
+      if (this.getState() === Autodesk.Viewing.UI.Button.State.ACTIVE) {
         NOP_VIEWER.unloadExtension(EXTENSIONS.navigationPanel);
+        this.setState(Autodesk.Viewing.UI.Button.State.INACTIVE);
+      } else {
+        NOP_VIEWER.loadExtension(EXTENSIONS.navigationPanel, { urn });
+        this.setState(Autodesk.Viewing.UI.Button.State.ACTIVE);
       }
     };
   }

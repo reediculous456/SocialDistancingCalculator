@@ -3,9 +3,9 @@ import { MeasureExtension } from './itscMeasure/Measure';
 
 export default class MeasureExtensionLoader extends Autodesk.Viewing.Extension {
   constructor(viewer, options) {
-    super();
-    Autodesk.Viewing.Extension.call(this, viewer);
+    super(viewer, options);
     Autodesk.Viewing.theExtensionManager.registerExtension(EXTENSIONS.itscMeasure, MeasureExtension);
+    this.viewer = viewer;
     this.urn = options.urn;
   }
 
@@ -13,12 +13,12 @@ export default class MeasureExtensionLoader extends Autodesk.Viewing.Extension {
     const toolProto = this;
     $(`#modelTools`).hide();
     setTimeout(() => {
-      NOP_VIEWER.unloadExtension(EXTENSIONS.autodeskMeasure);
-      NOP_VIEWER.getToolbar(false).removeControl(`measureTools`);
+      this.viewer.unloadExtension(EXTENSIONS.autodeskMeasure);
+      this.viewer.getToolbar(false).removeControl(`measureTools`);
     }, 3000);
 
     setTimeout(() => {
-      NOP_VIEWER.loadExtension(EXTENSIONS.itscMeasure, { urn: toolProto.urn }).then(measureExtension => {
+      this.viewer.loadExtension(EXTENSIONS.itscMeasure, { urn: toolProto.urn }).then(measureExtension => {
         $(`#modelTools`).hide();
         $(`#toolbar-measureTool-angle`).remove();
 

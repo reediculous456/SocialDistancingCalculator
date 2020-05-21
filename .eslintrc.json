@@ -17,7 +17,6 @@
   },
   "globals": {
     "Autodesk": true,
-    "av": true,
     "is_preprod": true,
     "NOP_VIEWER": true,
     "THREE": true,

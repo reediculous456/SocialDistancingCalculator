@@ -6,18 +6,14 @@ export class HelpButton extends Autodesk.Viewing.UI.Button {
     this.addClass(`fa`);
     this.setIcon(`fa-question`);
     this.setToolTip(`Help`);
-    this.addClass(`inactive`);
 
-    const proto = this;
-    this.onClick = (e) => {
-      if ($(e.target).parent().hasClass(`inactive`)) {
-        proto.removeClass(`inactive`);
-        proto.addClass(`active`);
-        NOP_VIEWER.loadExtension(EXTENSIONS.helpMenu);
-      } else {
-        proto.removeClass(`active`);
-        proto.addClass(`inactive`);
+    this.onClick = () => {
+      if (this.getState() === Autodesk.Viewing.UI.Button.State.ACTIVE) {
         NOP_VIEWER.unloadExtension(EXTENSIONS.helpMenu);
+        this.setState(Autodesk.Viewing.UI.Button.State.INACTIVE);
+      } else {
+        NOP_VIEWER.loadExtension(EXTENSIONS.helpMenu);
+        this.setState(Autodesk.Viewing.UI.Button.State.ACTIVE);
       }
     };
   }

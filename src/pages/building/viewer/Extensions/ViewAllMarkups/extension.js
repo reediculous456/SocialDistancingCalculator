@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
-  COLORS, EXTENSIONS, FREEFORM_MODES, ID_INCREMENT,
-  TOOLBAR_BUTTON_IDS, TOOLBAR_BUTTONS,
+  COLORS, CUSTOM_TOOLBAR, EXTENSIONS, FREEFORM_MODES,
+  ID_INCREMENT, TOOLBAR_BUTTON_IDS,
 } from '../viewerConstants';
 import { loadSingleMarkup, makeToolbarVisible, setSingleStyle } from '../viewerFunctions';
 import ViewAllMarkupsPanel from './Panel';
@@ -9,22 +9,24 @@ import toastr from '@/plugins/notifications';
 
 export default class AllMarkupExtension extends Autodesk.Viewing.Extension {
   constructor(viewer, options) {
-    super();
-    Autodesk.Viewing.Extension.call(this, viewer);
+    super(viewer, options);
+    this.viewer = viewer;
     this.urn = options.urn;
   }
 
   load() {
-    NOP_VIEWER.unloadExtension(EXTENSIONS.freeformMarkup);
-    NOP_VIEWER.loadExtension(EXTENSIONS.markupsCore)
+    this.viewer.unloadExtension(EXTENSIONS.freeformMarkup);
+    this.viewer.loadExtension(EXTENSIONS.markupsCore)
       .then(this.showMarkupChoicesPanel());
     return true;
   }
 
   unload() {
-    NOP_VIEWER.unloadExtension(EXTENSIONS.markupsCore);
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.viewAllMarkups].removeClass(`active`);
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.viewAllMarkups].addClass(`inactive`);
+    this.viewer.unloadExtension(EXTENSIONS.markupsCore);
+    const button = this.viewer.toolbar
+      .getControl(CUSTOM_TOOLBAR)
+      .getControl(TOOLBAR_BUTTON_IDS.viewAllMarkups);
+    button.setState(Autodesk.Viewing.UI.Button.State.INACTIVE);
     this.panel.$destroy();
     return true;
   }
@@ -49,7 +51,7 @@ export default class AllMarkupExtension extends Autodesk.Viewing.Extension {
   }
 
   onCloseButtonClick() {
-    NOP_VIEWER.unloadExtension(EXTENSIONS.viewAllMarkups);
+    this.viewer.unloadExtension(EXTENSIONS.viewAllMarkups);
   }
 
   loadSingleTextMarkup(markup, markupTool) {
@@ -95,7 +97,7 @@ export default class AllMarkupExtension extends Autodesk.Viewing.Extension {
   }
 
   onViewButtonClick(freeformMarkups) {
-    const markupTool = NOP_VIEWER.getExtension(EXTENSIONS.markupsCore);
+    const markupTool = this.viewer.getExtension(EXTENSIONS.markupsCore);
 
     if (freeformMarkups.length) {
       markupTool.enterEditMode();
@@ -115,7 +117,7 @@ export default class AllMarkupExtension extends Autodesk.Viewing.Extension {
     } else {
       toastr.warning(`No markups to load!`);
       makeToolbarVisible();
-      NOP_VIEWER.unloadExtension(EXTENSIONS.viewAllMarkups);
+      this.viewer.unloadExtension(EXTENSIONS.viewAllMarkups);
     }
 
     this.panel.$bvModal.hide(`view-options-modal`);

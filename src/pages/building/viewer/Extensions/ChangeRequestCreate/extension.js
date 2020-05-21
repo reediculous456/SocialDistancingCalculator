@@ -1,28 +1,30 @@
 import Vue from 'vue';
 import { invert } from 'lodash';
 import { CR_STATUSES } from 'Constants';
-import { EXTENSIONS, TOOLBAR_BUTTON_IDS, TOOLBAR_BUTTONS } from '../viewerConstants';
+import { CUSTOM_TOOLBAR, EXTENSIONS, TOOLBAR_BUTTON_IDS } from '../viewerConstants';
 import CreateChangeRequestPanel from './Panel';
 import { ChangeRequestService } from '@/services';
 import toastr from '@/plugins/notifications';
 
 export default class ChangeRequestTool extends Autodesk.Viewing.Extension {
   constructor(viewer, options) {
-    super();
-    Autodesk.Viewing.Extension.call(this, viewer);
+    super(viewer, options);
     this.urn = options.urn;
+    this.viewer = viewer;
   }
 
   load() {
-    NOP_VIEWER.unloadExtension(EXTENSIONS.changeRequestView);
-    NOP_VIEWER.unloadExtension(EXTENSIONS.freeformMarkup);
+    this.viewer.unloadExtension(EXTENSIONS.changeRequestView);
+    this.viewer.unloadExtension(EXTENSIONS.freeformMarkup);
     this.createPanel();
     return true;
   }
 
   unload() {
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.changeRequestCreate].addClass(`inactive`);
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.changeRequestCreate].removeClass(`active`);
+    const button = this.viewer.toolbar
+      .getControl(CUSTOM_TOOLBAR)
+      .getControl(TOOLBAR_BUTTON_IDS.changeRequestCreate);
+    button.setState(Autodesk.Viewing.UI.Button.State.INACTIVE);
     this.panel.$destroy();
     $(this.ChangeRequestPanel.container).remove();
     return true;
@@ -32,7 +34,7 @@ export default class ChangeRequestTool extends Autodesk.Viewing.Extension {
     const toolPrototype = this;
 
     this.ChangeRequestPanel = new Autodesk.Viewing.UI.DockingPanel(
-      NOP_VIEWER.container,
+      this.viewer.container,
       `ChangeRequestCreationPanel`,
       `Select The Object(s)`,
     );
@@ -58,7 +60,7 @@ export default class ChangeRequestTool extends Autodesk.Viewing.Extension {
     this.panel.$on(`submit-request`, toolPrototype.onSubmitRequest.bind(toolPrototype));
 
     this.ChangeRequestPanel.setVisible(true);
-    NOP_VIEWER.addEventListener(Autodesk.Viewing.SELECTION_CHANGED_EVENT, this.onSelectionChange.bind(this));
+    this.viewer.addEventListener(Autodesk.Viewing.SELECTION_CHANGED_EVENT, this.onSelectionChange.bind(this));
   }
 
   onSelectionChange(event) {
@@ -75,7 +77,7 @@ export default class ChangeRequestTool extends Autodesk.Viewing.Extension {
 
   onSubmitRequest(object_ids, comment) {
     const toolPrototype = this;
-    NOP_VIEWER.model.getExternalIdMapping((data) => {
+    this.viewer.model.getExternalIdMapping((data) => {
       const selections = object_ids;
       const invertedData = invert(data);
       const attributes = [];
@@ -101,7 +103,7 @@ export default class ChangeRequestTool extends Autodesk.Viewing.Extension {
           })
             .then(() => {
               toastr.success(`Succesfully created your change request!`);
-              NOP_VIEWER.clearSelection();
+              toolPrototype.viewer.clearSelection();
             })
             .catch(() => {
               toastr.error(`There was an error submitting your change request`);

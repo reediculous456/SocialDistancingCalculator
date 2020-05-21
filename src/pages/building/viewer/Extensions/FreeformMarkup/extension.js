@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
-  COLORS, EXTENSIONS, FONTS, FREEFORM_MODES, ID_INCREMENT,
-  LEFT_MOUSE_BUTTON, STROKES, TOOLBAR_BUTTON_IDS, TOOLBAR_BUTTONS,
+  COLORS, CUSTOM_TOOLBAR, EXTENSIONS, FONTS, FREEFORM_MODES,
+  ID_INCREMENT, LEFT_MOUSE_BUTTON, STROKES, TOOLBAR_BUTTON_IDS,
 } from '../viewerConstants';
 import {
   deleteMarkup, detectMarkup, loadSingleMarkup, makeToolbarVisible,
@@ -14,25 +14,28 @@ import toastr from '@/plugins/notifications';
 
 export default class FreeformTool extends Autodesk.Viewing.Extension {
   constructor(viewer, options) {
-    super();
-    Autodesk.Viewing.Extension.call(this, viewer);
+    super(viewer, options);
+    this.viewer = viewer;
     this.urn = options.urn;
     this.cancel_creation = false;
   }
 
   load() {
-    NOP_VIEWER.unloadExtension(EXTENSIONS.changeRequestView);
-    NOP_VIEWER.unloadExtension(EXTENSIONS.changeRequestCreate);
-    NOP_VIEWER.unloadExtension(EXTENSIONS.viewAllMarkups);
+    this.viewer.unloadExtension(EXTENSIONS.changeRequestView);
+    this.viewer.unloadExtension(EXTENSIONS.changeRequestCreate);
+    this.viewer.unloadExtension(EXTENSIONS.viewAllMarkups);
     this.createPanel();
     return true;
   }
 
   unload() {
     this.panel.$destroy();
-    NOP_VIEWER.unloadExtension(EXTENSIONS.markupsCore);
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.freeformMarkup].removeClass(`active`);
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.freeformMarkup].addClass(`inactive`);
+    this.viewer.unloadExtension(EXTENSIONS.markupsCore);
+    const button = this.viewer.toolbar
+      .getControl(CUSTOM_TOOLBAR)
+      .getControl(TOOLBAR_BUTTON_IDS.freeformMarkup);
+    button.setState(Autodesk.Viewing.UI.Button.State.INACTIVE);
+
     $(document).off(`mouseup`);
     $(document).off(`keydown`);
     $(this.MarkupPanel.container).remove();
@@ -43,7 +46,7 @@ export default class FreeformTool extends Autodesk.Viewing.Extension {
     const toolPrototype = this;
 
     this.MarkupPanel = new Autodesk.Viewing.UI.DockingPanel(
-      NOP_VIEWER.container,
+      this.viewer.container,
       `FreeformMarkupPanel`,
       `Freeform Markups`,
     );
@@ -66,7 +69,7 @@ export default class FreeformTool extends Autodesk.Viewing.Extension {
       }),
     });
     this.panel.$on(`closed`, () => {
-      NOP_VIEWER.unloadExtension(EXTENSIONS.freeformMarkup);
+      toolPrototype.viewer.unloadExtension(EXTENSIONS.freeformMarkup);
     });
     this.panel.$on(`size-changed`, toolPrototype.sizeSelectionChanged.bind(toolPrototype));
 
@@ -111,7 +114,7 @@ export default class FreeformTool extends Autodesk.Viewing.Extension {
   freeformMarkupHandler() {
     const toolPrototype = this;
     $(document).off(`mouseup`);
-    NOP_VIEWER.loadExtension(EXTENSIONS.markupsCore)
+    this.viewer.loadExtension(EXTENSIONS.markupsCore)
       .then((markupTool) => {
         toolPrototype.markupTool = markupTool;
         markupTool.addEventListener(Autodesk.Viewing.Extensions.Markups.Core.EVENT_EDITMODE_CHANGED,

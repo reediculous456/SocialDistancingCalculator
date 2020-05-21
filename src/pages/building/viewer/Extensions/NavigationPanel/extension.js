@@ -1,17 +1,17 @@
 import Vue from 'vue';
-import { EXTENSIONS, TOOLBAR_BUTTON_IDS, TOOLBAR_BUTTONS } from '../viewerConstants';
+import { CUSTOM_TOOLBAR, EXTENSIONS, TOOLBAR_BUTTON_IDS } from '../viewerConstants';
 import NavigationPanel from './Panel';
 
 export default class NavigationExtension extends Autodesk.Viewing.Extension {
   constructor(viewer, options) {
-    super();
-    Autodesk.Viewing.Extension.call(this, viewer);
+    super(viewer, options);
+    this.viewer = viewer;
     this.urn = options.urn;
   }
 
   load() {
     this.NavigationPanel = new Autodesk.Viewing.UI.DockingPanel(
-      NOP_VIEWER.container,
+      this.viewer.container,
       `NavigationPanel`,
       `Change Floors/Leave Viewer`,
     );
@@ -23,6 +23,9 @@ export default class NavigationExtension extends Autodesk.Viewing.Extension {
     this.NavigationPanel.container.style.width = `320px`;
     this.NavigationPanel.container.style.resize = `none`;
     $(this.NavigationPanel.container).find(`.docking-panel-footer-resizer`).remove();
+    $(this.NavigationPanel.container).on(`click`, `.docking-panel-close`, () => {
+      this.viewer.unloadExtension(EXTENSIONS.navigationPanel);
+    });
     $(this.NavigationPanel.container).append(`<div id="navigation-panel" />`);
 
     this.panel = new Vue({
@@ -36,17 +39,14 @@ export default class NavigationExtension extends Autodesk.Viewing.Extension {
 
     this.NavigationPanel.setVisible(true);
 
-    $(this.NavigationPanel.container).on(`click`, `.docking-panel-close`, () => {
-      NOP_VIEWER.unloadExtension(EXTENSIONS.navigationPanel);
-    });
-
     return true;
   }
 
   unload() {
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.navigationPanel].removeClass(`active`);
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.navigationPanel].addClass(`inactive`);
-    this.panel.$destroy();
+    const button = this.viewer.toolbar
+      .getControl(CUSTOM_TOOLBAR)
+      .getControl(TOOLBAR_BUTTON_IDS.navigationPanel);
+    button.setState(Autodesk.Viewing.UI.Button.State.INACTIVE);
     $(this.NavigationPanel.container).remove();
     return true;
   }

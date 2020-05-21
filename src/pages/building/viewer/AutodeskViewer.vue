@@ -40,6 +40,9 @@ export default {
   },
   methods: {
     onInitialized() {
+      const viewerDiv = document.getElementById(`forgeViewer`);
+      this.viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerDiv);
+      this.viewer.start();
       this.loadDocument();
       Autodesk.Viewing.theExtensionManager.registerExtension(EXTENSIONS.buttonLoader, ButtonLoader);
       Autodesk.Viewing.theExtensionManager.registerExtension(EXTENSIONS.measureLoader, MeasureExtensionLoader);
@@ -61,27 +64,15 @@ export default {
         $(`body`).css(`overflow`, `hidden`);
         $(`#footer`).css(`display`, `none`);
 
-        const viewable = Autodesk.Viewing.Document.getSubItemsWithProperties(doc.getRootItem(), {
-          type: `geometry`,
-          role: `2d`,
-        }, true);
+        const viewable = doc.getRoot().search({ type: `geometry`, role: `2d` });
 
         if (viewable.length === 0) {
           return;
         }
 
-        this.startViewer(doc, viewable[0]);
+        this.viewer.loadDocumentNode(doc, viewable[0])
+          .then(this.onModelLoadSuccess);
       }
-    },
-    startViewer(doc, initialViewable) {
-      const svfUrl = doc.getViewablePath(initialViewable);
-      const modelOptions = {
-        sharedPropertyDbPath: doc.getPropertyDbPath(),
-      };
-      const viewerDiv = document.getElementById(`forgeViewer`);
-      this.viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerDiv);
-
-      this.viewer.start(svfUrl, modelOptions, this.onModelLoadSuccess, this.onModelLoadFail);
     },
     onDocumentLoadFailure(viewerErrorCode) {
       if (viewerErrorCode === this.error_types.STILL_TRANSLATING) {
@@ -96,16 +87,19 @@ export default {
       console.error(`Document Load Failure - errorCode: ${viewerErrorCode}`); // eslint-disable-line no-console
     },
     onModelLoadSuccess() {
+      this.viewer.addEventListener(Autodesk.Viewing.EXTENSION_LOADED_EVENT, this.onExtensionLoaded);
       const navTools = this.viewer.toolbar.getControl(`navTools`);
       navTools.removeControl(`toolbar-cameraSubmenuTool`);
       const settingsTools = this.viewer.toolbar.getControl(`settingsTools`);
-      settingsTools.removeControl(`toolbar-propertiesTool`);
       settingsTools.removeControl(`toolbar-fullscreenTool`);
       this.viewer.loadExtension(EXTENSIONS.buttonLoader, { urn: this.urn });
-      this.viewer.loadExtension(EXTENSIONS.measureLoader, { urn: this.urn });
+      // this.viewer.loadExtension(EXTENSIONS.measureLoader, { urn: this.urn });
     },
-    onModelLoadFail(errorCode) {
-      console.error(`Model Load Failure - errorCode: ${errorCode}`); // eslint-disable-line no-console
+    onExtensionLoaded(event) {
+      const { extensionId } = event;
+      if (extensionId === `Autodesk.PropertiesManager`) {
+        this.viewer.unloadExtension(`Autodesk.PropertiesManager`);
+      }
     },
   },
 };

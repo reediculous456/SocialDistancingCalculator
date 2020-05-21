@@ -3,7 +3,6 @@ export const LEFT_MOUSE_BUTTON = 0;
 export const THREE_RED_COLOR = new THREE.Color(0xff0000);
 export const THREE_BLUE_COLOR = new THREE.Color(0x0000ff);
 export const CUSTOM_TOOLBAR = `custom-toolbar`;
-export const TOOLBAR_BUTTONS = {};
 
 export const FREEFORM_MODES = {
   FREE_LINE: 1,

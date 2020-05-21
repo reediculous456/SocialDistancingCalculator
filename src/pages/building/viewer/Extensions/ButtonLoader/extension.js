@@ -1,4 +1,4 @@
-import { CUSTOM_TOOLBAR, EXTENSIONS, TOOLBAR_BUTTONS } from '../viewerConstants';
+import { CUSTOM_TOOLBAR, EXTENSIONS } from '../viewerConstants';
 import AllMarkupExtension from '../ViewAllMarkups/extension';
 import ChangeRequestTool from '../ChangeRequestCreate/extension';
 import ChangeRequestView from '../ChangeRequestView/extension';
@@ -16,8 +16,7 @@ import {
 
 export default class ButtonLoader extends Autodesk.Viewing.Extension {
   constructor(viewer, options) {
-    super();
-    Autodesk.Viewing.Extension.call(this, viewer);
+    super(viewer, options);
     const ave = Autodesk.Viewing.theExtensionManager;
     ave.registerExtension(EXTENSIONS.changeRequestCreate, ChangeRequestTool);
     ave.registerExtension(EXTENSIONS.changeRequestView, ChangeRequestView);
@@ -25,6 +24,7 @@ export default class ButtonLoader extends Autodesk.Viewing.Extension {
     ave.registerExtension(EXTENSIONS.viewAllMarkups, AllMarkupExtension);
     ave.registerExtension(EXTENSIONS.helpMenu, HelpExtension);
     ave.registerExtension(EXTENSIONS.navigationPanel, NavigationExtension);
+    this.viewer = viewer;
     this.urn = options.urn;
   }
 
@@ -34,13 +34,13 @@ export default class ButtonLoader extends Autodesk.Viewing.Extension {
     }
     else {
       this.onToolbarCreatedBinded = this.onToolbarCreated.bind(this);
-      this.viewer.addEventListener(av.TOOLBAR_CREATED_EVENT, this.onToolbarCreatedBinded);
+      this.viewer.addEventListener(Autodesk.Viewing.TOOLBAR_CREATED_EVENT, this.onToolbarCreatedBinded);
     }
     return true;
   }
 
   onToolbarCreated() {
-    this.viewer.removeEventListener(av.TOOLBAR_CREATED_EVENT, this.onToolbarCreatedBinded);
+    this.viewer.removeEventListener(Autodesk.Viewing.TOOLBAR_CREATED_EVENT, this.onToolbarCreatedBinded);
     this.onToolbarCreatedBinded = null;
     this.createButtons();
   }
@@ -54,18 +54,17 @@ export default class ButtonLoader extends Autodesk.Viewing.Extension {
       new NavigationButton(this.urn),
       new HelpButton(),
     ];
-    if (NOP_VIEWER.toolbar.getControl(CUSTOM_TOOLBAR) === null) {
+
+    if (this.viewer.toolbar.getControl(CUSTOM_TOOLBAR) === null) {
       this.subToolbar = new Autodesk.Viewing.UI.ControlGroup(CUSTOM_TOOLBAR);
       for (const button of buttons) {
-        TOOLBAR_BUTTONS[button._id] = button;
         this.subToolbar.addControl(button);
       }
       this.viewer.toolbar.addControl(this.subToolbar);
     }
     else {
-      this.subToolbar = buttons[0].toolbar.getControl(CUSTOM_TOOLBAR);
+      this.subToolbar = this.viewer.toolbar.getControl(CUSTOM_TOOLBAR);
       for (const button of buttons) {
-        TOOLBAR_BUTTONS[button._id] = button;
         this.subToolbar.addControl(button);
       }
     }

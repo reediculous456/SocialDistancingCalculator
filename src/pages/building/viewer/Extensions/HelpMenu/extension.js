@@ -1,4 +1,4 @@
-import { EXTENSIONS, TOOLBAR_BUTTON_IDS, TOOLBAR_BUTTONS } from '../viewerConstants';
+import { CUSTOM_TOOLBAR, EXTENSIONS, TOOLBAR_BUTTON_IDS } from '../viewerConstants';
 import {
   addCreateChangeRequestHelpOptions,
   addFreeformMarkupHelpOptions,
@@ -7,16 +7,16 @@ import {
 } from './HelpOptions';
 
 export default class HelpExtension extends Autodesk.Viewing.Extension {
-  constructor(viewer) {
-    super();
-    Autodesk.Viewing.Extension.call(this, viewer);
+  constructor(viewer, options) {
+    super(viewer, options);
+    this.viewer = viewer;
   }
 
   load() {
     let markupHelpPanel;
     const MarkupPanel = $(`#MarkupHelpPanel`);
     if (!MarkupPanel.length) {
-      markupHelpPanel = new Autodesk.Viewing.UI.PropertyPanel(NOP_VIEWER.container, `MarkupHelpPanel`, `Help`);
+      markupHelpPanel = new Autodesk.Viewing.UI.PropertyPanel(this.viewer.container, `MarkupHelpPanel`, `Help`);
       markupHelpPanel.container.style.height = `330px`;
       markupHelpPanel.container.style.width = `390px`;
       markupHelpPanel.container.style.resize = `none`;
@@ -28,7 +28,7 @@ export default class HelpExtension extends Autodesk.Viewing.Extension {
 
       $(`#MarkupHelpPanel`).find(`.docking-panel-footer-resizer`).remove();
       $(`#MarkupHelpPanel`).on(`click`, `.docking-panel-close`, () => {
-        NOP_VIEWER.unloadExtension(EXTENSIONS.helpMenu);
+        this.viewer.unloadExtension(EXTENSIONS.helpMenu);
       });
     }
 
@@ -41,8 +41,10 @@ export default class HelpExtension extends Autodesk.Viewing.Extension {
 
   unload() {
     $(`#MarkupHelpPanel`).css(`display`, `none`);
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.helpMenu].removeClass(`active`);
-    TOOLBAR_BUTTONS[TOOLBAR_BUTTON_IDS.helpMenu].addClass(`inactive`);
+    const button = this.viewer.toolbar
+      .getControl(CUSTOM_TOOLBAR)
+      .getControl(TOOLBAR_BUTTON_IDS.helpMenu);
+    button.setState(Autodesk.Viewing.UI.Button.State.INACTIVE);
     return true;
   }
 

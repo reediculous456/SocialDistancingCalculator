@@ -7,16 +7,13 @@ export class ViewAllMarkupsButton extends Autodesk.Viewing.UI.Button {
     this.setIcon(`fa-eye`);
     this.setToolTip(`View All Markups`);
 
-    const proto = this;
-    this.onClick = e => {
-      if ($(e.target).parent().hasClass(`inactive`)) {
-        proto.addClass(`active`);
-        proto.removeClass(`inactive`);
-        NOP_VIEWER.loadExtension(EXTENSIONS.viewAllMarkups, { urn });
-      } else {
-        proto.addClass(`inactive`);
-        proto.removeClass(`active`);
+    this.onClick = () => {
+      if (this.getState() === Autodesk.Viewing.UI.Button.State.ACTIVE) {
         NOP_VIEWER.unloadExtension(EXTENSIONS.viewAllMarkups);
+        this.setState(Autodesk.Viewing.UI.Button.State.INACTIVE);
+      } else {
+        NOP_VIEWER.loadExtension(EXTENSIONS.viewAllMarkups, { urn });
+        this.setState(Autodesk.Viewing.UI.Button.State.ACTIVE);
       }
     };
   }

@@ -9,14 +9,14 @@ export default {
     Viewer: () => new Promise((resolve) => {
       const viewerCss = document.createElement(`link`);
       viewerCss.rel = `stylesheet`;
-      viewerCss.href = `https://developer.api.autodesk.com/modelderivative/v2/viewers/6.*/style.min.css`;
+      viewerCss.href = `https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css`;
 
       const viewerScript = document.createElement(`script`);
       viewerScript.onload = () => {
         resolve(import(`./AutodeskViewer`));
       };
       viewerScript.async = true;
-      viewerScript.src = `https://developer.api.autodesk.com/modelderivative/v2/viewers/6.*/viewer3D.min.js`;
+      viewerScript.src = `https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js`;
 
       document.head.appendChild(viewerCss);
       document.head.appendChild(viewerScript);
