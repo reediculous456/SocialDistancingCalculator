@@ -99,6 +99,11 @@ export default {
       const { extensionId } = event;
       if (extensionId === `Autodesk.PropertiesManager`) {
         this.viewer.unloadExtension(`Autodesk.PropertiesManager`);
+      } else if (extensionId === `Autodesk.Measure`) {
+        this.viewer.getExtension(EXTENSIONS.autodeskMeasure).setUnits(`decimal-ft`);
+        const measureTools = this.viewer.toolbar.getControl(`measureTools`);
+        measureTools.removeControl(`toolbar-measureTool-angle`);
+        measureTools.removeControl(`toolbar-calibrationTool`);
       }
     },
   },
