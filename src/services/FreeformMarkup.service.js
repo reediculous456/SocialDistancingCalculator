@@ -11,9 +11,9 @@ export const FreeformMarkupService = {
       throw new Error(err);
     }),
 
-  getAllByUrn: ({ markupType, urn_id }) => Axios.get(`${BASE_URL}/urn/${urn_id}`, {
+  getAllByUrn: ({ type_ids, urn_id }) => Axios.get(`${BASE_URL}/urn/${urn_id}`, {
     params: {
-      markupType,
+      type_ids,
     },
   })
     .then(response => response.data.data.markups)

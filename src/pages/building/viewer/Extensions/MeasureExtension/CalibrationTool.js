@@ -4,23 +4,26 @@
 import { CalibrationToolIndicator } from './CalibrationToolIndicator';
 import { CalibrationPanel } from './CalibrationPanels';
 
+const av = Autodesk.Viewing;
+
 //
 // /** @constructor */
 //
 //
-export var CalibrationTool = function( viewer, options, sharedMeasureConfig, snapper)
-{
+export var CalibrationTool = function (viewer, options, sharedMeasureConfig, snapper) {
   var av = Autodesk.Viewing;
   var avem = Autodesk.Viewing.Extensions.Measure;
   var MeasureCommon = Autodesk.Viewing.MeasureCommon;
 
-  var _names  = [ `calibration` ];
+  var _names = [ `calibration` ];
   var _priority = 50;
-  var _viewer  = viewer;
+  var _viewer = viewer;
   var _measurement = new MeasureCommon.Measurement(MeasureCommon.MeasurementTypes.MEASUREMENT_DISTANCE);
   var _options = options || {};
 
-    // Shared State with MeasureTool and Indicator
+  this.setGlobalManager(viewer.globalManager);
+
+  // Shared State with MeasureTool and Indicator
   var _sharedMeasureConfig = sharedMeasureConfig;
 
   var _maxPrecision = options.maxPrecision || 5;
@@ -51,73 +54,69 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
   var _downX = null;
   var _downY = null;
 
-    // GUI.
+  // GUI.
   var _calibrationPanel = null;
   var _cursor = `url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAYCAYAAAD+vg1LAAAAAXNSR0IArs4c6QAAAwZJREFUSA2tVEtLW0EUvjGJefoqSY0x0WBSiY+oNWiUINkU6ioLaaAlG1eudNVFoT+grgopiCkEIbUK1o0lusmurRSEWmmKG6MNtNhNosWqyU2CZPpN8cr15nFD7YHDzHnON2fOGYZhmHkw4XEW+wD4xkT4lMvl6CE0+Y2ohh+dz+cZn89HVS/5+n/d/wVMkXq9Xor2v5SBgsmymQwZHx+vOqlKpXKDXWI3eU6Tg+kqSjSh3W4/s9lsvzUajaNcAK3xY7Dyci3nd6WXSCS60dHRvMfjSRcKBfWV4SYbrVarB8p0PB5nY7HYmdVq/aDX67WlckpKKcvpOjs7X09OTvoPDw8z2Wy2Bu+imJqa+npycnJXGHOt3YRGoSyVSvvMZrNkYWFBs7GxkaoBAXFJcDJhcCW5rq5ur62trQ/EOhyOBhDT2Nj4qVKMqA31ve1yub7Rfufo/PycDA4OxpuamhqECaouhVqtfuD3+1tqa2uZQCCQDoVCWTwknVQDDvIKE1clI1ja09Ozg0cjx8fHpL+/P+50OhMU8f7+Punt7f2I5NdqXRXi9fV1z9jYWCuIWV5eziSTyWAqlXq1urqaw6AwOMiCG4lOYtEturu732xubhK0FQHSvfr6+lsog4HWPIPvIBqNErRiqCiwkkKpVFowZd8xZSQYDLImk+kJ52+xWJ4tLS3hU8yTkZGRBD2Ms4mu6Nun4XA4f3p6SoaGhuJ0+rgg/Bsmt9udYFmWzM3NZdDT05ztWsE5JV0R1AqUCfTt0fb2tjESiRRmZmaOUOcI3w9DY5mdnb03PDzMoDQ/MZFRzM20lO/E38vl8vt46UdAq0WNJWixlEwmu8B1bXioOxwjpgXJ0hMTE1og1qysrDghf+HnKtoD7c7u7i5ZXFzMGY3GF7iFuRR3dHTMr62tXWxtbZH29vZ3RYmECozu54ODAzpdP2hphHZOVigUVjChvgMDA+85fdm1q6vrrU6n+4WR9Zd1ujQ0Nzc/NBgMScSExXwZ2j5oL5Wo46UD/ZvxUemo+AdW1zJzUYr16wAAAABJRU5ErkJggg==), auto`;
-  var _hasUI = Autodesk.Viewing.Private.GuiViewer3D && viewer instanceof Autodesk.Viewing.Private.GuiViewer3D;
+  var _hasUI = Autodesk.Viewing.GuiViewer3D && viewer instanceof Autodesk.Viewing.GuiViewer3D;
 
   var MeasureCommon = Autodesk.Viewing.MeasureCommon;
 
-  function getActivePick()
-    {
+  function getActivePick () {
     switch (_activePoint) {
-    case 0:
-      return null;
-    case 1:
-    case 2:
-      return _measurement.getPick(_activePoint);
-    case 3:
-      return _measurement.getPick(_measurement.countPicks());
+      case 0:
+        return null;
+      case 1:
+      case 2:
+        return _measurement.getPick(_activePoint);
+      case 3:
+        return _measurement.getPick(_measurement.countPicks());
     }
   }
 
-  function getPreviousPick()
-    {
+  function getPreviousPick () {
     switch (_activePoint) {
-    case 0:
-      return null;
-    case 1:
-      return _measurement.getPick(_measurement.countPicks());
-    case 2:
-    case 3:
-      return _measurement.getPick(1);
+      case 0:
+        return null;
+      case 1:
+        return _measurement.getPick(_measurement.countPicks());
+      case 2:
+      case 3:
+        return _measurement.getPick(1);
     }
   }
 
-  function hasPreviousPick()
-    {
+  function hasPreviousPick () {
     switch (_activePoint) {
-    case 0:
-      return false;
-    case 1:
-      return _measurement.hasPick(_measurement.countPicks());
-    case 2:
-    case 3:
-      return _measurement.hasPick(1);
+      case 0:
+        return false;
+      case 1:
+        return _measurement.hasPick(_measurement.countPicks());
+      case 2:
+      case 3:
+        return _measurement.hasPick(1);
     }
   }
 
-  function noPicksSet() {
+  function noPicksSet () {
     _activePoint = 0;
   }
 
-  function allPicksSet() {
+  function allPicksSet () {
     _activePoint = 3;
     _measurement.indicator.changeAllEndpointsEditableStyle(true);
   }
 
-  function isNoPicksSet() {
+  function isNoPicksSet () {
     return _activePoint === 0;
   }
 
-  function areAllPicksSet() {
+  function areAllPicksSet () {
     return _activePoint === 3;
   }
 
-  this.register = function()
-    {
+  this.register = function () {
     if (_hasUI && !_calibrationPanel) {
-      _calibrationPanel = new CalibrationPanel( this, _viewer, `calibration-panel`, `Calibration`, _options );
+      _calibrationPanel = new CalibrationPanel(this, _viewer, `calibration-panel`, `Calibration`, _options);
       _viewer.addPanel(_calibrationPanel);
     }
 
@@ -125,43 +124,37 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     this.screenSizeChangedBinded = this.screenSizeChanged.bind(this);
   };
 
-  this.deregister = function()
-    {
+  this.deregister = function () {
     this.deactivate();
 
     if (_calibrationPanel) {
-      _viewer.removePanel( _calibrationPanel );
+      _viewer.removePanel(_calibrationPanel);
       _calibrationPanel.uninitialize();
       _calibrationPanel = null;
     }
   };
 
-  this.isActive = function()
-    {
+  this.isActive = function () {
     return _active;
   };
 
-  this.getNames = function()
-    {
+  this.getNames = function () {
     return _names;
   };
 
-  this.getName = function()
-    {
+  this.getName = function () {
     return _names[0];
   };
 
-  this.getPriority = function()
-    {
+  this.getPriority = function () {
     return _priority;
   };
 
-  this.getCursor = function() {
+  this.getCursor = function () {
     return _isDragging ? null : _cursor;
   };
 
-  this.activate = function()
-    {
+  this.activate = function () {
     _active = true;
     _isDragging = false;
     this.isEditingEndpoint = false;
@@ -205,8 +198,7 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     _viewer.addEventListener(Autodesk.Viewing.VIEWER_RESIZE_EVENT, this.screenSizeChangedBinded);
   };
 
-  this.deactivate = function()
-    {
+  this.deactivate = function () {
     if (!_active)
       return;
 
@@ -217,7 +209,7 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     _waitingForInput = false;
     _measurement.clearAllPicks();
 
-    if(_snapper && _snapper.isActive()) {
+    if (_snapper && _snapper.isActive()) {
       _viewer.toolController.deactivateTool(_snapper.getName());
     }
 
@@ -233,11 +225,11 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     _viewer.removeEventListener(Autodesk.Viewing.VIEWER_RESIZE_EVENT, this.screenSizeChangedBinded);
   };
 
-  this.getActivePointIndex = function() {
+  this.getActivePointIndex = function () {
     return _activePoint;
   };
 
-  this.setCalibrationFactor = function ( calibrationFactor ) {
+  this.setCalibrationFactor = function (calibrationFactor) {
     _sharedMeasureConfig.calibrationFactor = calibrationFactor;
   };
 
@@ -249,13 +241,12 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     _measurement.indicator.updateLabelValue(value);
   };
 
-  this.isCalibrationValid = function(requestedUnits, requestedSize) {
+  this.isCalibrationValid = function (requestedUnits, requestedSize) {
     var parsedRequestedSize = Autodesk.Viewing.Private.UnitParser.parsePositiveNumber(requestedSize, requestedUnits);
     return !isNaN(parsedRequestedSize);
   };
 
-  this.calibrate = function(requestedUnits, requestedSize)
-    {
+  this.calibrate = function (requestedUnits, requestedSize) {
 
     var calibrationFactor = null;
 
@@ -281,14 +272,14 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
 
     if (calibrationFactor) {
       _viewer.getExtension(`Autodesk.Measure`).enableCalibrationTool(false);
-      _viewer.dispatchEvent({ type: `finished-calibration` });
+      _viewer.dispatchEvent({ type: MeasureCommon.Events.FINISHED_CALIBRATION, units: requestedUnits, scaleFactor: calibrationFactor, size: requestedSize });
     }
   };
 
-  this.calibrateByScale = function(requestedUnits, requestedScale) {
+  this.calibrateByScale = function (requestedUnits, requestedScale) {
     _sharedMeasureConfig.calibrationFactor = requestedScale;
 
-    if (_sharedMeasureConfig.units !== requestedUnits ) {
+    if (_sharedMeasureConfig.units !== requestedUnits) {
       _sharedMeasureConfig.units = requestedUnits;
       _selectedUnits = requestedUnits;
     }
@@ -300,7 +291,7 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     return _sharedMeasureConfig.units;
   };
 
-  this.hidePanel = function() {
+  this.hidePanel = function () {
     if (_calibrationPanel) {
       _calibrationPanel.setVisible(false);
     }
@@ -309,35 +300,36 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     }
   };
 
-  this.showPanel = function() {
+  this.showPanel = function () {
 
     var self = this;
+    const _window = this.getWindow();
 
     if (_calibrationPanel) {
-      window.setTimeout(function () { _calibrationPanel.requestedSizeTextbox.focus();}, 0);
+      _window.setTimeout(function () { _calibrationPanel.requestedSizeTextbox.focus(); }, 0);
       _calibrationPanel.setVisible(true);
       _calibrationPanel.updatePanelPosition(_measurement.indicator.labelPosition, _measurement.indicator.p1, _measurement.indicator.p2, _measurement.indicator.calibrationLabel.clientHeight);
-      window.addEventListener(`keyup`, function onKeyUp(e){
+      self.addWindowEventListener(`keyup`, function onKeyUp (e) {
         var key = e.key || String.fromCharCode(e.keyCode);
         if (key == `Escape` && self.isActive()) {
           self.hidePanel();
           self.clearSize();
           self.showAddCalibrationLabel();
 
-          window.removeEventListener(`keyup`, onKeyUp);
+          self.removeWindowEventListener(`keyup`, onKeyUp);
         }
       });
     }
     else {
-      _viewer.dispatchEvent({ type: MeasureCommon.Events.OPEN_CALIBRATION_PANEL_EVENT, data: {size: _selectedSize, units: _selectedUnits } });
+      _viewer.dispatchEvent({ type: MeasureCommon.Events.OPEN_CALIBRATION_PANEL_EVENT, data: { size: _selectedSize, units: _selectedUnits } });
     }
   };
 
-  this.showAddCalibrationLabel = function() {
+  this.showAddCalibrationLabel = function () {
     _measurement.indicator.showAddCalibrationLabel();
   };
 
-  this.isCalibrated = function() {
+  this.isCalibrated = function () {
     return _isCalibrated;
   };
 
@@ -352,11 +344,11 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     }
   };
 
-  this.getMaxPrecision = function() {
+  this.getMaxPrecision = function () {
     return _maxPrecision;
   };
 
-  this.clearMeasurement = function() {
+  this.clearMeasurement = function () {
 
     noPicksSet();
 
@@ -371,19 +363,19 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     _waitingForInput = false;
   };
 
-  this.clearPick = function(pickNumber) {
+  this.clearPick = function (pickNumber) {
     if (_measurement.hasPick(pickNumber)) {
       _measurement.clearPick(pickNumber);
       _measurement.indicator.hideClick(pickNumber);
     }
   };
 
-  this.repickEndpoint = function(pickNumber) {
+  this.repickEndpoint = function (pickNumber) {
     this.clearPick(pickNumber);
     this.editEndpoint(null, pickNumber);
   };
 
-  this.getSnapper = function() {
+  this.getSnapper = function () {
     return _snapper;
   };
 
@@ -393,7 +385,7 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
 
     if (_snapper.isSnapped()) {
 
-            // User picked a new point after two points where already set (or none) - Start a new measurement.
+      // User picked a new point after two points where already set (or none) - Start a new measurement.
       if (areAllPicksSet() || isNoPicksSet()) {
         this.clearMeasurement();
         _activePoint = 1;
@@ -405,18 +397,18 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
 
     }
     else {
-            // In order to draw rubber-band, set the cursor position, so the indicator will use it as active point.
+      // In order to draw rubber-band, set the cursor position, so the indicator will use it as active point.
       if (event && _viewer.model.is2d()) {
         var viewport = _viewer.container.getBoundingClientRect();
         var x = event.canvasX || event.clientX - viewport.left;
         var y = event.canvasY || event.clientY - viewport.top;
 
         if (x && y) {
-          _cursorPosition = MeasureCommon.inverseProject({ x:x, y:y }, _viewer);
+          _cursorPosition = MeasureCommon.inverseProject({ x: x, y: y }, _viewer);
         }
       }
 
-            // In case a measurement is set, and the user clicks on a blank spot - don't do nothing.
+      // In case a measurement is set, and the user clicks on a blank spot - don't do nothing.
       if (_consumeSingleClick && _measurement && !this.isEditingEndpoint) {
         if (_activePoint === _measurement.getMaxNumberOfPicks() + 1) {
           return true;
@@ -438,8 +430,8 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     if (!isNoPicksSet()) {
       var renderSucceeded = this.render();
 
-            // If it's the first pick, we don't expect the render of the rubberband to be succeeded.
-            // So enter here only if it's not the first pick.
+      // If it's the first pick, we don't expect the render of the rubberband to be succeeded.
+      // So enter here only if it's not the first pick.
       if (_measurement.hasPick(2)) {
         valid &= renderSucceeded;
       }
@@ -459,11 +451,11 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
       }
     }
 
-        // If valid is false, the last pick is not revelant, and will clear it in case of a click.
+    // If valid is false, the last pick is not revelant, and will clear it in case of a click.
     return valid;
   };
 
-  this.updateViewportId = function(clear) {
+  this.updateViewportId = function (clear) {
     if (_viewer.model && _viewer.model.is2d()) {
       if (clear || isNoPicksSet()) {
         viewer.impl.updateViewportId(0);
@@ -472,7 +464,7 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
       else if (!_isPressing) {
         var viewport = getPreviousPick().viewportIndex2d || getActivePick().viewportIndex2d;
 
-                // Pass viewport Id to LineShader to make all other geometries with different viewport transparent
+        // Pass viewport Id to LineShader to make all other geometries with different viewport transparent
         viewer.impl.updateViewportId(viewport);
         if (_snapper)
           _snapper.setViewportId(viewport);
@@ -481,7 +473,7 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     }
   };
 
-  this._doConsumeSingleClick = function(valid) {
+  this._doConsumeSingleClick = function (valid) {
 
     this.updateViewportId(_measurement.isComplete());
 
@@ -524,9 +516,9 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
 
   this.restoreMouseListeners = function () {
 
-        // When a press event has happend, the default behavior of firefly.js is to disable other mouse events,
-        // So they won't be triggered as well.
-        // The solution is to enable them after the end of the pressing.
+    // When a press event has happend, the default behavior of firefly.js is to disable other mouse events,
+    // So they won't be triggered as well.
+    // The solution is to enable them after the end of the pressing.
 
     _viewer.toolController.getTool(`gestures`).controller.enableMouseButtons(true);
   };
@@ -535,34 +527,33 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     _consumeSingleClick = false;
 
     if (av.isTouchDevice()) {
-      switch( event.type )
-            {
-      case `press`:
-        _isPressing = true;
-        if (areAllPicksSet()) {
-          this.clearMeasurement();
-        } else {
-          this.clearPick(_activePoint);
-        }
-        this._handleMouseEvent(event);
-        _snapper.indicator.render();
+      switch (event.type) {
+        case `press`:
+          _isPressing = true;
+          if (areAllPicksSet()) {
+            this.clearMeasurement();
+          } else {
+            this.clearPick(_activePoint);
+          }
+          this._handleMouseEvent(event);
+          _snapper.indicator.render();
 
-        return true;
+          return true;
 
-      case `pressup`:
-        _consumeSingleClick = true;
-        this.restoreMouseListeners();
-        _singleClickHandled = !_singleClickHandled;
-        this.handleSingleClick(event);
-        _isPressing = false;
-        return true;
+        case `pressup`:
+          _consumeSingleClick = true;
+          this.restoreMouseListeners();
+          _singleClickHandled = !_singleClickHandled;
+          this.handleSingleClick(event);
+          _isPressing = false;
+          return true;
       }
     }
     return false;
 
   };
 
-  this.correctPickPosition = function() {
+  this.correctPickPosition = function () {
 
     var active = getActivePick();
 
@@ -578,7 +569,7 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     }
   };
 
-  this.render = function() {
+  this.render = function () {
 
     var hasResult = _measurement.computeResult(_measurement.picks, _viewer, _snapper);
     _measurement.indicator.render(_measurement.picks, _consumeSingleClick || _waitingForInput);
@@ -586,7 +577,7 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     return hasResult;
   };
 
-  this.editEndpoint = function(event, endpointNumber) {
+  this.editEndpoint = function (event, endpointNumber) {
     if (_activePoint === endpointNumber) {
       _measurement.indicator.changeEndpointOnEditStyle(endpointNumber, false);
       this.undoEditEndpoint();
@@ -611,12 +602,12 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     _measurement.indicator.updateLabelValue(null);
     _waitingForInput = false;
 
-    if(!av.isMobileDevice()) {
+    if (!av.isMobileDevice()) {
       this._handleMouseEvent(event);
     }
   };
 
-  this.undoEditEndpoint = function() {
+  this.undoEditEndpoint = function () {
     _measurement.indicator.clear();
 
     for (var key in _measurement.picks) {
@@ -637,9 +628,8 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     }
   };
 
-  this.handleGesture = function(event)
-    {
-    if (av.isTouchDevice()){
+  this.handleGesture = function (event) {
+    if (av.isTouchDevice()) {
 
       _consumeSingleClick = false;
 
@@ -647,39 +637,38 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
 
         this.clearPick(_activePoint);
 
-        switch( event.type )
-                {
-        case `dragstart`:
-          this._handleMouseEvent(event);
-          _snapper.indicator.render();
+        switch (event.type) {
+          case `dragstart`:
+            this._handleMouseEvent(event);
+            _snapper.indicator.render();
 
-          return true;
+            return true;
 
-        case `dragmove`:
-          this._handleMouseEvent(event);
-          _snapper.indicator.render();
+          case `dragmove`:
+            this._handleMouseEvent(event);
+            _snapper.indicator.render();
 
-          return true;
+            return true;
 
-        case `dragend`:
-          _isPressing = false;
-          _consumeSingleClick = true;
+          case `dragend`:
+            _isPressing = false;
+            _consumeSingleClick = true;
 
-          if (!this.editByDrag) {
+            if (!this.editByDrag) {
+              _singleClickHandled = !_singleClickHandled;
+              this.handleSingleClick(event);
+            }
+
+            this.editByDrag = false;
+            this.restoreMouseListeners();
+            return true;
+
+          case `pinchend`:
+            _consumeSingleClick = true;
             _singleClickHandled = !_singleClickHandled;
             this.handleSingleClick(event);
-          }
-
-          this.editByDrag = false;
-          this.restoreMouseListeners();
-          return true;
-
-        case `pinchend`:
-          _consumeSingleClick = true;
-          _singleClickHandled = !_singleClickHandled;
-          this.handleSingleClick(event);
-          this.restoreMouseListeners();
-          return true;
+            this.restoreMouseListeners();
+            return true;
         }
       }
     }
@@ -736,14 +725,14 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     return true;
   };
 
-  this.handleDoubleClick = function() {
+  this.handleDoubleClick = function () {
     return true;
   };
 
   this.handleSingleTap = function (event) {
     if (!_singleClickHandled) {
       _consumeSingleClick = true;
-      _snapper.onMouseDown({x: event.canvasX, y:event.canvasY});
+      _snapper.onMouseDown({ x: event.canvasX, y: event.canvasY });
       this.handleSingleClick(event);
     }
     _singleClickHandled = !_singleClickHandled;
@@ -751,23 +740,25 @@ export var CalibrationTool = function( viewer, options, sharedMeasureConfig, sna
     return true;
   };
 
-  this.handleDoubleTap = function() {
+  this.handleDoubleTap = function () {
     return true;
   };
 
-  this.handleResize = function() {
+  this.handleResize = function () {
     if (_measurement.indicator) {
       _measurement.indicator.handleResize();
     }
   };
 
-  this.onCameraChange = function() {
+  this.onCameraChange = function () {
     if (_snapper.indicator) {
       _snapper.indicator.onCameraChange();
     }
   };
 
-  this.screenSizeChanged = function(event) {
+  this.screenSizeChanged = function (event) {
     this.onCameraChange();
   };
 };
+
+av.GlobalManagerMixin.call(CalibrationTool.prototype);

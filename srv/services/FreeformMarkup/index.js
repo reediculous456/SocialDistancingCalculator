@@ -16,8 +16,9 @@ const FreeformMarkupService = {
     .fetchAll({ require: true })
     .then(jsonify),
 
-  getForUrn: (urn_id) => FreeformMarkup
+  getForUrn: ({ type_ids, urn_id }) => FreeformMarkup
     .where({ urn_id })
+    .where(`type_id`, `in`, type_ids)
     .fetchAll()
     .then(jsonify),
 

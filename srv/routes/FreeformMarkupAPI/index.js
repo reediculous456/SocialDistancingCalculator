@@ -35,7 +35,8 @@ router.get(`/:id`, async (req, res, next) => {
 
 router.get(`/urn/:urn_id`, async (req, res, next) => {
   try {
-    const markups = await FreeformMarkupService.getForUrn(req.params.urn_id);
+    const { params: { urn_id }, query: { type_ids } } = req;
+    const markups = await FreeformMarkupService.getForUrn({ type_ids: arrify(type_ids), urn_id });
 
     ResponseHandler(
       res,

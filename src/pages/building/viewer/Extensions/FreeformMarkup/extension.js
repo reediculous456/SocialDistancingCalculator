@@ -128,7 +128,10 @@ export default class FreeformTool extends Autodesk.Viewing.Extension {
 
         markupTool.enterEditMode();
 
-        FreeformMarkupService.getAllByUrn({ urn_id: toolPrototype.urn.id })
+        FreeformMarkupService.getAllByUrn({
+          type_ids: [ FREEFORM_MODES.TEXT, FREEFORM_MODES.FREE_LINE, FREEFORM_MODES.POLYLINE ],
+          urn_id: toolPrototype.urn.id,
+        })
           .then(markups => {
             toolPrototype.loadFreeformMarkups(markups);
           })

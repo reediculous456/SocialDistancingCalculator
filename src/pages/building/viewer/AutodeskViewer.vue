@@ -5,7 +5,7 @@
 <script>
 import arrify from 'arrify';
 import ButtonLoader from './Extensions/ButtonLoader/extension';
-import MeasureExtensionLoader from './Extensions/MeasureExtensionLoader/extension';
+import { MeasureExtension } from './Extensions/MeasureExtension/Measure';
 import { EXTENSIONS } from './Extensions/viewerConstants';
 import { ForgeService, UrnService } from '@/services';
 
@@ -45,7 +45,7 @@ export default {
       this.viewer.start();
       this.loadDocument();
       Autodesk.Viewing.theExtensionManager.registerExtension(EXTENSIONS.buttonLoader, ButtonLoader);
-      Autodesk.Viewing.theExtensionManager.registerExtension(EXTENSIONS.measureLoader, MeasureExtensionLoader);
+      Autodesk.Viewing.theExtensionManager.registerExtension(EXTENSIONS.itscMeasure, MeasureExtension);
     },
     loadDocument() {
       Autodesk.Viewing.Document.load(
@@ -88,23 +88,32 @@ export default {
     },
     onModelLoadSuccess() {
       this.viewer.addEventListener(Autodesk.Viewing.EXTENSION_LOADED_EVENT, this.onExtensionLoaded);
+      this.viewer.addEventListener(Autodesk.Viewing.EXTENSION_UNLOADED_EVENT, this.onExtensionUnloaded);
       const navTools = this.viewer.toolbar.getControl(`navTools`);
       navTools.removeControl(`toolbar-cameraSubmenuTool`);
       const settingsTools = this.viewer.toolbar.getControl(`settingsTools`);
       settingsTools.removeControl(`toolbar-fullscreenTool`);
       this.viewer.loadExtension(EXTENSIONS.buttonLoader, { urn: this.urn });
-      // this.viewer.loadExtension(EXTENSIONS.measureLoader, { urn: this.urn });
     },
     onExtensionLoaded(event) {
       const { extensionId } = event;
       if (extensionId === `Autodesk.PropertiesManager`) {
         this.viewer.unloadExtension(`Autodesk.PropertiesManager`);
-      } else if (extensionId === `Autodesk.Measure`) {
-        this.viewer.getExtension(EXTENSIONS.autodeskMeasure)
-          .setUnits(`decimal-ft`);
+      } else if (extensionId === EXTENSIONS.autodeskMeasure) {
+        this.viewer.unloadExtension(EXTENSIONS.autodeskMeasure);
+      } else if (extensionId === EXTENSIONS.itscMeasure) {
+        const extension = this.viewer.getExtension(EXTENSIONS.itscMeasure);
+        extension.setUnits(`decimal-ft`);
+        extension.setFreeMeasureMode(true);
         const measureTools = this.viewer.toolbar.getControl(`measureTools`);
         measureTools.removeControl(`toolbar-measureTool-angle`);
         measureTools.removeControl(`toolbar-calibrationTool`);
+      }
+    },
+    onExtensionUnloaded(event) {
+      const { extensionId } = event;
+      if (extensionId === EXTENSIONS.autodeskMeasure) {
+        this.viewer.loadExtension(EXTENSIONS.itscMeasure, { urn: this.urn });
       }
     },
   },
