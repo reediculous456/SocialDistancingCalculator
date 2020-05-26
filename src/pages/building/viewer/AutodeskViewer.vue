@@ -104,6 +104,7 @@ export default {
       } else if (extensionId === EXTENSIONS.itscMeasure) {
         const extension = this.viewer.getExtension(EXTENSIONS.itscMeasure);
         extension.setUnits(`decimal-ft`);
+        extension.setPrecision(2);
         extension.setFreeMeasureMode(true);
         const measureTools = this.viewer.toolbar.getControl(`measureTools`);
         measureTools.removeControl(`toolbar-measureTool-angle`);

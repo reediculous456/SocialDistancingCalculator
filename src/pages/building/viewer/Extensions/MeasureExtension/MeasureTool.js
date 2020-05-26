@@ -1331,6 +1331,39 @@ export function MeasureTool(viewer, options, sharedMeasureConfig, snapper) {
       _snapper.indicator.clearOverlays();
 
       if (_currentMeasurement) {
+        // ITSC CODE
+        /* eslint-enable */
+        const feetXYZ = Autodesk.Viewing.Private.convertUnits(
+          _viewer.model.getUnitString(),
+          `decimal-ft`,
+          _sharedMeasureConfig.calibrationFactor,
+          _currentMeasurement.distanceXYZ || 0,
+        );
+
+        if (feetXYZ < 6.5 && feetXYZ > 5.5) {
+          const sixFeet = Autodesk.Viewing.Private.convertUnits(
+            `decimal-ft`,
+            _viewer.model.getUnitString(),
+            _sharedMeasureConfig.calibrationFactor,
+            6,
+          );
+
+          const [
+            ,
+            { geomVertex: geomVertex1 },
+            { geomVertex: geomVertex2, intersectPoint: intersectPoint2 },
+          ] = _currentMeasurement.picks;
+
+          const x2 = geomVertex1.x + sixFeet * (_currentMeasurement.distanceX / _currentMeasurement.distanceXYZ);
+          const y2 = geomVertex1.y + sixFeet * (_currentMeasurement.distanceY / _currentMeasurement.distanceXYZ);
+          geomVertex2.x = x2;
+          intersectPoint2.x = x2;
+          geomVertex2.y = y2;
+          intersectPoint2.y = y2;
+        }
+        /* eslint-disable */
+        // ITSC CODE
+
         _currentMeasurement.indicator.changeEndpointOnEditStyle(_activePoint, false);
       }
 
