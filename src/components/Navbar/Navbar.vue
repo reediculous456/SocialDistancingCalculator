@@ -14,7 +14,7 @@
         class="navbar-brand align-middle"
         href="/"
       >
-        Maintenence Request
+        Social Distance Calculator
       </b-nav-item>
     </b-navbar-brand>
     <b-navbar-toggle target="nav-collapse" />

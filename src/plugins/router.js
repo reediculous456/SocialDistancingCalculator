@@ -10,7 +10,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || `Maintenance Request`;
+  document.title = to.meta.title || `Social Distancing Calculator`;
   next();
 });
 

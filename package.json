@@ -2,7 +2,7 @@
   "name": "social-distancing-calculator",
   "version": "1.0.0",
   "private": true,
-  "description": "Forge Maintenence Request Application",
+  "description": "Social Distance Calculator Application",
   "main": "src/index.js",
   "repository": {
     "type": "git",
