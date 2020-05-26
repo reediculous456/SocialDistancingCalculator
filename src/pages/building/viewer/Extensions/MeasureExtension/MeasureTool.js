@@ -565,7 +565,7 @@ export function MeasureTool(viewer, options, sharedMeasureConfig, snapper) {
 
     const p = _currentMeasurement.setPick(json.id, new Autodesk.Viewing.MeasureCommon.SnapResult());
 
-    if (json.geomEdge) {
+    if (json.geomEdge && json.geomEdge.data) {
       p.geomEdge = new THREE.Geometry();
       const a = json.geomEdge.data.vertices;
       p.geomEdge.vertices.push(new THREE.Vector3(a[0], a[1], a[2]));
