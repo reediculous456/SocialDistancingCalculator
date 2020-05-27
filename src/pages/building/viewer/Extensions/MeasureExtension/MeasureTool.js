@@ -1354,8 +1354,17 @@ export function MeasureTool(viewer, options, sharedMeasureConfig, snapper) {
             { geomVertex: geomVertex2, intersectPoint: intersectPoint2 },
           ] = _currentMeasurement.picks;
 
-          const x2 = geomVertex1.x + sixFeet * (_currentMeasurement.distanceX / _currentMeasurement.distanceXYZ);
-          const y2 = geomVertex1.y + sixFeet * (_currentMeasurement.distanceY / _currentMeasurement.distanceXYZ);
+          const x2 =
+            geomVertex1.x +
+            sixFeet *
+            (_currentMeasurement.distanceX / _currentMeasurement.distanceXYZ) *
+            Math.sign(geomVertex2.x - geomVertex1.x);
+          const y2 =
+            geomVertex1.y +
+            sixFeet *
+            (_currentMeasurement.distanceY / _currentMeasurement.distanceXYZ) *
+            Math.sign(geomVertex2.y - geomVertex1.y);
+
           geomVertex2.x = x2;
           intersectPoint2.x = x2;
           geomVertex2.y = y2;
