@@ -84,10 +84,10 @@ export default {
       return ROLES.ADMIN === user.role_id;
     },
     showReportDropdown() {
-      return ROLES.ADMIN === user.role_id;
+      return false;
     },
     showDashboard() {
-      return ROLES.ADMIN === user.role_id;
+      return false;
     },
   },
   methods: {
