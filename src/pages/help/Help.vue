@@ -3,7 +3,7 @@
     <b-row>
       <b-col>
         <b-card
-          header="Square Footage Support"
+          header="Social Distancing Calculator Support"
           header-tag="h4"
         >
           <p style="margin-bottom: 1rem;">
@@ -38,7 +38,7 @@ export default {
   name: `help`,
   data() {
     return {
-      supportName: `IT Solutions Center`,
+      supportName: `the IT Solutions Center`,
       supportEmail: `itsolctr@ucmail.uc.edu`,
       supportPhone: `5135564357`,
     };
