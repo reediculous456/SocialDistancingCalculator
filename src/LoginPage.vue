@@ -13,7 +13,7 @@
             <div class="content">
               <p class="hidden-xs d-none d-sm-block float-left col-sm-8 alt-wrapping text-white">
                 Sign in to: <br>
-                <strong>https://something.cech.uc.edu</strong>
+                <strong>https://itscappdev07.cech.uc.edu</strong>
               </p>
               <img
                 class="float-right logo"
