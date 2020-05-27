@@ -1,6 +1,7 @@
 const knex = require(`./knex`);
 const Bookshelf = require(`bookshelf`)(knex);
 Bookshelf.plugin(require(`bookshelf-soft-delete`));
+Bookshelf.plugin(require(`bookshelf-upsert`));
 
 const User = Bookshelf.Model.extend({
   tableName: `users`,

@@ -1,29 +1,48 @@
 const { Building, User, jsonify } = require(`../../database`);
 const { ROLES } = require(`../../../constants`);
+const ActiveDirectoryService = require(`../ActiveDirectory`);
 const TokenService = require(`../Token`);
-const bcrypt = require(`bcrypt`);
-const SALT_ROUNDS = 10;
+const { logger } = require(`../../utils/Logging/winston`);
 
 const UserService = {
   authenticate: async (username, password) => {
     try {
-      const user = await UserService.getByUsername(username.toLowerCase());
-      const authResult = bcrypt.compareSync(password, user.password);
-      if (!authResult) { throw new Error(); }
-      delete user.password;
-      return TokenService.generate({ user });
-    } catch {
+      if (!username || !password) {
+        throw new Error(`Invalid parameters provided`);
+      }
+
+      const [ adUser ] = await ActiveDirectoryService.find({ username: username.toLowerCase() });
+
+      if (!adUser) {
+        throw new Error(`Wrong Username`);
+      }
+
+      const user = await UserService.upsert({
+        email: adUser.email.toLowerCase(),
+        name: adUser.name,
+        phone: adUser.phone ? adUser.phone : null,
+        username: adUser.username.toLowerCase(),
+      });
+
+      if (!user.active) {
+        throw new Error(`Inactive User`);
+      }
+
+      await ActiveDirectoryService.authenticate(
+        username,
+        password,
+      );
+
+      return TokenService.generate({
+        user: {
+          id: user.id,
+          role_id: user.role_id,
+        },
+      });
+    } catch (err) {
+      logger.error(``, err);
       throw new Error(`Invalid Username or Password`);
     }
-  },
-
-  create: (user) => {
-    const { password } = user;
-    user.password = bcrypt.hashSync(password, SALT_ROUNDS);
-    return User
-      .forge()
-      .save(user)
-      .then(jsonify);
   },
 
   getAdmins: () => User
@@ -58,6 +77,11 @@ const UserService = {
     .fetchAll({
       withRelated: [ `role` ],
     })
+    .then(jsonify),
+
+  upsert: (user) => User
+    .where({ username: user.username })
+    .upsert(user)
     .then(jsonify),
 };
 

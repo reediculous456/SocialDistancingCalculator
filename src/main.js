@@ -8,13 +8,15 @@ import router from '@/plugins/router';
 import toastr from '@/plugins/notifications';
 import AppRoot from '@/App';
 
-const errorHandler = function(err) {
-  toastr.error(err);
-  console.error(err); // eslint-disable-line no-console
-};
-
 Vue.config.devtools = true;
-Vue.config.errorHandler = errorHandler;
+Vue.config.errorHandler = (err) => {
+  const { response } = err;
+  toastr.error(
+    response ? `\n ${response.data.err.message}` : err,
+    response ? `Error ${response.status}: ${response.statusText}` : undefined,
+  );
+  console.error(response ? response : err); // eslint-disable-line no-console
+};
 
 Vue.use(BootstrapVue);
 

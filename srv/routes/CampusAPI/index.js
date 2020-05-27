@@ -1,19 +1,13 @@
 const router = require(`express`).Router();
 const arrify = require(`arrify`);
-const { ROLES } = require(`../../../constants`);
 const { CampusService } = require(`../../services`);
 const { ResponseHandler } = require(`../../utils`);
 
 router.get(`/list`, async (req, res, next) => {
   try {
-    const { query: { active }, user } = req;
-    let campuses;
+    const { query: { active } } = req;
 
-    if (user.role.id === ROLES.ADMIN) {
-      campuses = await CampusService.getList(active);
-    } else if (user.role.id === ROLES.user) {
-      campuses = await CampusService.getForUser(user.id);
-    }
+    const campuses = await CampusService.getList(active);
 
     ResponseHandler(
       res,

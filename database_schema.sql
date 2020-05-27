@@ -92,16 +92,6 @@ ALTER SEQUENCE public.buildings_id_seq OWNED BY public.buildings.id;
 
 
 --
--- Name: buildings_users; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.buildings_users (
-    building_id integer NOT NULL,
-    user_id integer NOT NULL
-);
-
-
---
 -- Name: campuses; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -527,12 +517,11 @@ ALTER SEQUENCE public.urns_id_seq OWNED BY public.urns.id;
 CREATE TABLE public.users (
     id integer NOT NULL,
     name text NOT NULL,
-    email text,
+    email text NOT NULL,
     phone text,
     username text NOT NULL,
-    password text NOT NULL,
-    role_id integer NOT NULL,
-    active boolean DEFAULT false NOT NULL
+    role_id integer DEFAULT 2 NOT NULL,
+    active boolean DEFAULT true NOT NULL
 );
 
 
@@ -678,14 +667,6 @@ ALTER TABLE ONLY public.buildings
 
 
 --
--- Name: buildings_users buildings_users_building_id_user_id_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.buildings_users
-    ADD CONSTRAINT buildings_users_building_id_user_id_key UNIQUE (building_id, user_id);
-
-
---
 -- Name: campuses campuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -819,22 +800,6 @@ ALTER TABLE ONLY public.buildings
 
 ALTER TABLE ONLY public.buildings
     ADD CONSTRAINT buildings_campus_id_fkey FOREIGN KEY (campus_id) REFERENCES public.campuses(id);
-
-
---
--- Name: buildings_users buildings_users_building_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.buildings_users
-    ADD CONSTRAINT buildings_users_building_id_fkey FOREIGN KEY (building_id) REFERENCES public.buildings(id);
-
-
---
--- Name: buildings_users buildings_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.buildings_users
-    ADD CONSTRAINT buildings_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

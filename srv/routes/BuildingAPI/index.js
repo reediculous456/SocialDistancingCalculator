@@ -1,19 +1,13 @@
 const router = require(`express`).Router();
 const arrify = require(`arrify`);
-const { ROLES } = require(`../../../constants`);
 const { BuildingService } = require(`../../services`);
 const { ResponseHandler } = require(`../../utils`);
 
 router.get(`/list`, async (req, res, next) => {
   try {
-    const { query: { active }, user } = req;
-    let buildings;
+    const { query: { active } } = req;
 
-    if (user.role.id === ROLES.ADMIN) {
-      buildings = await BuildingService.getList(active);
-    } else if (user.role.id === ROLES.USER) {
-      buildings = await BuildingService.getForUser(user.id);
-    }
+    const buildings = await BuildingService.getList(active);
 
     ResponseHandler(
       res,
