@@ -1333,43 +1333,43 @@ export function MeasureTool(viewer, options, sharedMeasureConfig, snapper) {
       if (_currentMeasurement) {
         // ITSC CODE
         /* eslint-enable */
-        const feetXYZ = Autodesk.Viewing.Private.convertUnits(
-          _viewer.model.getUnitString(),
+        // const feetXYZ = Autodesk.Viewing.Private.convertUnits(
+        //   _viewer.model.getUnitString(),
+        //   `decimal-ft`,
+        //   _sharedMeasureConfig.calibrationFactor,
+        //   _currentMeasurement.distanceXYZ || 0,
+        // );
+
+        // if (feetXYZ < 6.5 && feetXYZ > 5.5) {
+        const sixFeet = Autodesk.Viewing.Private.convertUnits(
           `decimal-ft`,
+          _viewer.model.getUnitString(),
           _sharedMeasureConfig.calibrationFactor,
-          _currentMeasurement.distanceXYZ || 0,
+          6,
         );
 
-        if (feetXYZ < 6.5 && feetXYZ > 5.5) {
-          const sixFeet = Autodesk.Viewing.Private.convertUnits(
-            `decimal-ft`,
-            _viewer.model.getUnitString(),
-            _sharedMeasureConfig.calibrationFactor,
-            6,
-          );
+        const [
+          ,
+          { geomVertex: geomVertex1 },
+          { geomVertex: geomVertex2, intersectPoint: intersectPoint2 },
+        ] = _currentMeasurement.picks;
 
-          const [
-            ,
-            { geomVertex: geomVertex1 },
-            { geomVertex: geomVertex2, intersectPoint: intersectPoint2 },
-          ] = _currentMeasurement.picks;
+        const x2 =
+          geomVertex1.x +
+          sixFeet *
+          (_currentMeasurement.distanceX / _currentMeasurement.distanceXYZ) *
+          Math.sign(geomVertex2.x - geomVertex1.x);
+        const y2 =
+          geomVertex1.y +
+          sixFeet *
+          (_currentMeasurement.distanceY / _currentMeasurement.distanceXYZ) *
+          Math.sign(geomVertex2.y - geomVertex1.y);
 
-          const x2 =
-            geomVertex1.x +
-            sixFeet *
-            (_currentMeasurement.distanceX / _currentMeasurement.distanceXYZ) *
-            Math.sign(geomVertex2.x - geomVertex1.x);
-          const y2 =
-            geomVertex1.y +
-            sixFeet *
-            (_currentMeasurement.distanceY / _currentMeasurement.distanceXYZ) *
-            Math.sign(geomVertex2.y - geomVertex1.y);
-
-          geomVertex2.x = x2;
-          intersectPoint2.x = x2;
-          geomVertex2.y = y2;
-          intersectPoint2.y = y2;
-        }
+        geomVertex2.x = x2;
+        intersectPoint2.x = x2;
+        geomVertex2.y = y2;
+        intersectPoint2.y = y2;
+        // }
         /* eslint-disable */
         // ITSC CODE
 
