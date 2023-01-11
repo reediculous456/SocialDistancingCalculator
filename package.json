@@ -49,7 +49,7 @@
     "font-awesome": "^4.7.0",
     "forge-apis": "^0.7.3",
     "jquery": "^3.5.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "knex": "^0.19.5",
     "lodash": "^4.17.15",
     "long-press-event": "^2.2.1",
